@@ -1,0 +1,20 @@
+<article class="panel">
+  <h2>{{ title }}</h2>
+  <section class="mini-grid grid gap-3 [grid-template-columns:repeat(auto-fit,minmax(120px,1fr))]">
+    @for (item of items; track item.label) {
+      <article
+        class="overflow-hidden rounded-xl border border-lion-100 bg-[#f7fbff] p-3 text-center"
+        [class.tone-success]="item.tone === 'success'"
+        [class.tone-danger]="item.tone === 'danger'"
+      >
+        <span class="block text-[15pt] text-[#5a5f66]">{{ item.label }}</span>
+        <strong class="mt-1.5 block text-[15pt] text-lion-800">{{ item.value }}</strong>
+        @if (item.subtitle) {
+          <small class="mt-1 block truncate text-[15pt] text-[#5a5f66]">
+            {{ item.subtitle }}
+          </small>
+        }
+      </article>
+    }
+  </section>
+</article>

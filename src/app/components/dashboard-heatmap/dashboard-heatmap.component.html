@@ -1,0 +1,21 @@
+<article class="panel">
+  <h2>{{ chart.title }}</h2>
+
+  <div class="heatmap-wrap">
+    <div class="header-row">
+      <span class="placeholder"></span>
+      @for (column of chart.columns; track column) {
+        <span class="column-label">{{ column }}</span>
+      }
+    </div>
+
+    @for (row of chart.series; track row.name) {
+      <div class="data-row">
+        <span class="row-label">{{ row.name }}</span>
+        @for (value of row.values; track $index) {
+          <span class="cell" [style.opacity]="getCellOpacity(value)"></span>
+        }
+      </div>
+    }
+  </div>
+</article>

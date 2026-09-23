@@ -1,0 +1,28 @@
+<div #pdfRoot class="pdf-root">
+  <section
+    class="header mb-5 flex flex-col items-start gap-4 sm:flex-row sm:items-center"
+    [class.header--with-logo]="!!logoSrc()"
+  >
+    <div class="header-actions pdf-hide flex shrink-0 flex-wrap gap-2.5">
+      <app-button (clicked)="goBack()">Volver</app-button>
+      <app-button [isDisabled]="exporting()" (clicked)="downloadPdf()">
+        {{ exporting() ? 'Generando PDF...' : 'Descargar PDF' }}
+      </app-button>
+    </div>
+    <div class="header-text min-w-0 flex-1">
+      <h1 class="m-0 text-3xl font-bold text-lion-800">{{ clientName() }}</h1>
+      <p class="mb-0 mt-1 text-[#5a5f66]">
+        Información operativa y comercial recibida por API REST.
+      </p>
+    </div>
+    @if (logoSrc()) {
+      <img
+        class="client-logo ml-auto block h-auto w-[min(160px,28vw)] shrink-0"
+        [src]="logoSrc()"
+        [alt]="clientName()"
+      />
+    }
+  </section>
+
+  <ng-content />
+</div>

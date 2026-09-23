@@ -1,0 +1,9 @@
+<app-client-dashboard [clientId]="clientId()" [logoSrc]="logoSrc()">
+  <app-dashboard-mini-hub [title]="summaryTitle()" [items]="miniHubItems()" />
+  @if (mensajeria().length) {
+    <app-mensajeria-grafico [data]="mensajeria()" />
+  }
+  <app-integration-jobs-table [rows]="jobs()" />
+  <app-interface-jobs-table [rows]="interfaces()" />
+  <app-table-certificados [rows]="certificados()" />
+</app-client-dashboard>

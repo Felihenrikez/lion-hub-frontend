@@ -1,0 +1,23 @@
+<article class="panel">
+  <h2>Detalle por linea</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th>Volumen</th>
+        <th>Ingresos</th>
+        <th>Servicio</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows; track row.product) {
+        <tr>
+          <td>{{ row.product }}</td>
+          <td>{{ row.volume | number }}</td>
+          <td>{{ row.revenue | currency: 'USD' : 'symbol' : '1.0-0' }}</td>
+          <td>{{ row.compliance }}%</td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</article>

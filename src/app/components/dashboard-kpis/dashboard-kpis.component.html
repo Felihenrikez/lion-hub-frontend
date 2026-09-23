@@ -1,0 +1,9 @@
+<section class="kpis">
+  @for (kpi of kpis; track kpi.label) {
+    <article class="kpi-card">
+      <span class="kpi-label">{{ kpi.label }}</span>
+      <strong>{{ kpi.value }}</strong>
+      <small [class.down]="kpi.trend === 'down'">{{ getTrendSymbol(kpi.trend) }} Tendencia</small>
+    </article>
+  }
+</section>

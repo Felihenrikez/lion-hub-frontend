@@ -1,0 +1,55 @@
+<article class="panel">
+  <h2>Certificados</h2>
+
+  <section class="summary-hub">
+    <div class="summary-item tone-primary">
+      <span>Total</span>
+      <strong>{{ summary().total }}</strong>
+    </div>
+    @if (summary().daysToExpire !== null) {
+      <div class="summary-item" [class.tone-danger]="summary().daysToExpire! <= 30" [class.tone-warning]="summary().daysToExpire! > 30 && summary().daysToExpire! <= 90" [class.tone-success]="summary().daysToExpire! > 90">
+        <span>Próxima expiración</span>
+        <strong>{{ summary().daysToExpire }} días</strong>
+      </div>
+    }
+  </section>
+
+  <button class="accordion-toggle" (click)="toggle()">
+    {{ expanded() ? '▲ Ocultar detalle' : '▼ Ver detalle' }}
+  </button>
+
+  @if (expanded()) {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col" class="sortable" (click)="sortBy('fechaExpiracion')">
+              Fecha de Expiración <span class="sort-icon">{{ getSortIcon('fechaExpiracion') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('certificado')">
+              Certificado <span class="sort-icon">{{ getSortIcon('certificado') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('ticket')">
+              Ticket Asignado <span class="sort-icon">{{ getSortIcon('ticket') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('observacion')">
+              Observación <span class="sort-icon">{{ getSortIcon('observacion') }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of sortedRows(); track row.certificado; let i = $index) {
+            <tr>
+              <th scope="row">{{ i + 1 }}</th>
+              <td>{{ row.fechaExpiracion }}</td>
+              <td>{{ row.certificado }}</td>
+              <td>{{ row.ticket }}</td>
+              <td>{{ row.observacion }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

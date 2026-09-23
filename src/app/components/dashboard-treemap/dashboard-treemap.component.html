@@ -1,0 +1,13 @@
+<article class="panel">
+  <h2>{{ chart.title }}</h2>
+
+  <div class="treemap">
+    @for (item of chart.items; track item.name) {
+      <article class="tile" [style.flex-grow]="item.value" [style.background]="item.color">
+        <span class="name">{{ item.name }}</span>
+        <strong>{{ item.value }}</strong>
+        <small>{{ getAreaPercent(item) | number: '1.0-1' }}%</small>
+      </article>
+    }
+  </div>
+</article>

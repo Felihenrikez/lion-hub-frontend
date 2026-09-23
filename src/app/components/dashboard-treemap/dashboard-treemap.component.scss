@@ -1,0 +1,55 @@
+.panel {
+  border: 1px solid #dce7f0;
+  border-radius: 14px;
+  background: #fff;
+  padding: 1rem;
+
+  h2 {
+    margin: 0 0 0.85rem;
+    color: #139ad3;
+    font-size: 1rem;
+  }
+}
+
+.treemap {
+  display: flex;
+  min-height: 260px;
+  gap: 0.45rem;
+}
+
+.tile {
+  border-radius: 8px;
+  padding: 0.65rem;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  min-width: 70px;
+
+  .name {
+    font-size: 0.74rem;
+    line-height: 1.2;
+    opacity: 0.95;
+    word-break: break-word;
+  }
+
+  strong {
+    margin-top: 0.25rem;
+    font-size: 1rem;
+  }
+
+  small {
+    opacity: 0.92;
+  }
+}
+
+@media (max-width: 900px) {
+  .treemap {
+    flex-wrap: wrap;
+  }
+
+  .tile {
+    min-height: 100px;
+    flex-basis: calc(50% - 0.225rem);
+  }
+}

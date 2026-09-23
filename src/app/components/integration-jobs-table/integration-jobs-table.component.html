@@ -1,0 +1,65 @@
+<article class="panel">
+  <h2>Ejecuciones de Integración</h2>
+
+  <section class="summary-hub">
+    <div class="summary-item tone-primary">
+      <span>Total</span>
+      <strong>{{ summary().total }}</strong>
+    </div>
+    <div class="summary-item tone-success">
+      <span>OK</span>
+      <strong>{{ summary().ok }}</strong>
+    </div>
+    <div class="summary-item tone-danger">
+      <span>Failed</span>
+      <strong>{{ summary().failed }}</strong>
+    </div>
+    <div class="summary-item tone-warning">
+      <span>Desactivadas</span>
+      <strong>{{ summary().disabled }}</strong>
+    </div>
+  </section>
+
+  <button class="accordion-toggle" (click)="toggle()">
+    {{ expanded() ? '▲ Ocultar detalle' : '▼ Ver detalle' }}
+  </button>
+
+  @if (expanded()) {
+    <div class="data-table-wrap">
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col" class="sortable" (click)="sortBy('Artefacto')">
+              Artefacto <span class="sort-icon">{{ getSortIcon('Artefacto') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('Nombre Comun')">
+              Nombre Común <span class="sort-icon">{{ getSortIcon('Nombre Comun') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('Ejecución')">
+              Ejecución <span class="sort-icon">{{ getSortIcon('Ejecución') }}</span>
+            </th>
+            <th scope="col" class="sortable" (click)="sortBy('Estado')">
+              Estado <span class="sort-icon">{{ getSortIcon('Estado') }}</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of sortedRows(); track row.Artefacto; let i = $index) {
+            <tr>
+              <th scope="row">{{ i + 1 }}</th>
+              <td>{{ row.Artefacto }}</td>
+              <td>{{ row['Nombre Comun'] }}</td>
+              <td>{{ row['Ejecución'] }}</td>
+              <td>
+                <span class="status-pill" [class]="getStatusClass(row.Estado)">
+                  {{ row.Estado }}
+                </span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+</article>

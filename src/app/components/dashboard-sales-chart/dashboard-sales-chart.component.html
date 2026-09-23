@@ -1,0 +1,11 @@
+<article class="panel">
+  <h2>Ventas mensuales (k unidades)</h2>
+  <div class="bars">
+    @for (point of data; track point.month) {
+      <div class="bar-group">
+        <div class="bar" [style.height.%]="(point.value / maxSales) * 100"></div>
+        <span>{{ point.month }}</span>
+      </div>
+    }
+  </div>
+</article>

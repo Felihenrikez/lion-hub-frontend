@@ -1,0 +1,53 @@
+.panel {
+  border: 1px solid #dce7f0;
+  border-radius: 14px;
+  background: #fff;
+  padding: 1rem;
+
+  h2 {
+    margin: 0 0 0.85rem;
+    color: #139ad3;
+    font-size: 1rem;
+  }
+}
+
+.heatmap-wrap {
+  overflow-x: auto;
+}
+
+.header-row,
+.data-row {
+  display: grid;
+  grid-template-columns: 180px repeat(10, 1fr);
+  gap: 4px;
+  min-width: 680px;
+  align-items: center;
+}
+
+.header-row {
+  margin-bottom: 0.3rem;
+}
+
+.placeholder {
+  height: 1px;
+}
+
+.column-label {
+  font-size: 0.72rem;
+  color: #5a5f66;
+  text-align: center;
+}
+
+.row-label {
+  font-size: 0.75rem;
+  color: #0f4463;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.cell {
+  height: 22px;
+  background: #1a84d6;
+  border-radius: 3px;
+}
