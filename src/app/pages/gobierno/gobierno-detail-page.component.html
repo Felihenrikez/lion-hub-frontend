@@ -1,0 +1,385 @@
+<app-hub-header
+  title="Gobierno de interfaces"
+  subtitle="Ficha del iFlow: arquitectura, dependencias, responsable y auditoría."
+  backLink="/gobierno"
+  backLabel="Catálogo"
+  [backQuery]="listQuery()"
+  (logout)="logout()"
+/>
+
+@if (loading()) {
+  <p class="text-sm text-[#5a5f66]" aria-live="polite">Cargando ficha...</p>
+} @else if (errorMessage()) {
+  <p class="text-sm font-medium text-[#b42318]" role="alert">{{ errorMessage() }}</p>
+} @else if (flow(); as flow) {
+  <section class="panel">
+    <p class="m-0 text-xs font-semibold tracking-[0.14em] text-lion-500 uppercase">
+      {{ flow.artifactId || flow.name }}
+    </p>
+    <h2 class="mt-1 mb-3">{{ flow.businessName || flow.name }}</h2>
+    <div class="flex flex-wrap gap-2">
+      <span class="meta-badge">{{ clientLabel(flow.clientId) }}</span>
+      <span [class]="'meta-badge ' + statusTone(flow.status)">{{ statusLabel(flow.status) }}</span>
+      @if (flow.criticality) {
+        <span [class]="'meta-badge ' + criticalityTone(flow.criticality)">
+          {{ criticalityLabel(flow.criticality) }}
+        </span>
+      }
+      <span class="meta-badge">{{ flow.packageKey }}</span>
+      @for (environment of environments; track environment) {
+        <span
+          class="meta-badge"
+          [class.opacity-40]="!isPresent(flow, environment)"
+        >
+          {{ environment }}
+        </span>
+      }
+    </div>
+    <dl class="mt-4 mb-0 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-4">
+      <div>
+        <dt class="text-[#5a5f66]">Responsable</dt>
+        <dd class="m-0 font-semibold text-lion-800">{{ displayText(flow.owner) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[#5a5f66]">Revisor</dt>
+        <dd class="m-0 font-semibold text-lion-800">{{ displayText(flow.reviewer) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[#5a5f66]">Ambiente en revisión</dt>
+        <dd class="m-0 font-semibold text-lion-800">{{ selectedEnv() }}</dd>
+      </div>
+      <div>
+        <dt class="text-[#5a5f66]">Actualizada</dt>
+        <dd class="m-0 font-semibold text-lion-800">{{ formatDateTime(flow.updatedAt) }}</dd>
+      </div>
+    </dl>
+    @if (flow.retirement; as retirement) {
+      <p class="mt-4 mb-0 rounded-xl border border-[#f3d3a1] bg-[#fff5e9] px-3 py-2 text-sm text-[#8a5a07]">
+        Retirada el {{ formatDateTime(retirement.at) }}.
+        Motivo: {{ retirement.reason || 'Sin motivo' }}.
+        Estado anterior: {{ statusLabel(retirement.statusBefore) }}.
+        @if (retirement.manual) {
+          Retiro manual.
+        }
+      </p>
+    }
+    <p class="mt-4 mb-0 text-sm text-[#4f6578]">
+      Lo automático llega con el ZIP: paquete, versión, componentes y dependencias detectadas. Lo
+      manual es el gobierno de esta ficha y una nueva importación no lo pisa. No se muestran
+      secretos: solo la referencia de la credencial.
+    </p>
+  </section>
+
+  <div class="grid gap-4 xl:grid-cols-2">
+    <section class="panel">
+      <h2>Descripción funcional</h2>
+      <span class="meta-badge mb-3">Manual</span>
+      <p class="m-0 whitespace-pre-wrap text-sm leading-relaxed">
+        {{ displayText(flow.functionalDescription) }}
+      </p>
+      <dl class="mt-4 mb-0 grid gap-3 text-sm">
+        <div>
+          <dt class="text-[#5a5f66]">Proceso de negocio</dt>
+          <dd class="m-0">{{ displayText(flow.businessProcess) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Sistema origen</dt>
+          <dd class="m-0">{{ displayText(flow.sourceSystem) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Sistema destino</dt>
+          <dd class="m-0">{{ displayText(flow.targetSystem) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Información que transporta</dt>
+          <dd class="m-0 whitespace-pre-wrap">{{ displayText(flow.transportedData) }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Descripción técnica</h2>
+      <span class="meta-badge mb-3">Manual</span>
+      <p class="m-0 whitespace-pre-wrap text-sm leading-relaxed">
+        {{ displayText(flow.technicalDescription) }}
+      </p>
+      <dl class="mt-4 mb-0 grid gap-3 text-sm">
+        <div>
+          <dt class="text-[#5a5f66]">Nombre técnico</dt>
+          <dd class="m-0">{{ displayText(flow.name) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Package</dt>
+          <dd class="m-0">{{ displayText(flow.packageKey) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Artifact ID</dt>
+          <dd class="m-0">{{ displayText(flow.artifactId) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Proyecto / lineamiento</dt>
+          <dd class="m-0">{{ displayText(flow.project) }} · {{ displayText(flow.guideline) }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Ejecución</h2>
+    <p class="mt-0 text-sm text-[#162530]">
+      @if (flow.execution.mode) {
+        {{ executionLabel(flow.execution.mode) }}
+      } @else {
+        Modo sin definir
+      }
+      @if (flow.execution.frequency) {
+        , {{ flow.execution.frequency }}
+      }
+      @if (flow.criticality) {
+        . Criticidad {{ criticalityLabel(flow.criticality) }}.
+      }
+    </p>
+    <dl class="m-0 grid gap-3 text-sm sm:grid-cols-3">
+      <div>
+        <dt class="text-[#5a5f66]">Zona horaria</dt>
+        <dd class="m-0">{{ displayText(flow.execution.timeZone) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[#5a5f66]">Impacto de negocio</dt>
+        <dd class="m-0">{{ displayText(flow.businessImpact) }}</dd>
+      </div>
+      <div>
+        <dt class="text-[#5a5f66]">SLA de respuesta</dt>
+        <dd class="m-0">
+          @if (flow.slaResponseMinutes !== null && flow.slaResponseMinutes !== undefined) {
+            {{ flow.slaResponseMinutes }} min
+          } @else {
+            —
+          }
+        </dd>
+      </div>
+    </dl>
+    <p class="mt-3 mb-0 text-xs text-[#5a5f66]">Origen: {{ sourceLabel(flow.execution.source) }}</p>
+  </section>
+
+  <section class="panel">
+    <h2>Arquitectura · {{ selectedEnv() }}</h2>
+    <app-architecture-flow [flow]="flow" [environment]="selectedEnv()" />
+  </section>
+
+  <section class="panel">
+    <h2>Ambientes</h2>
+    <app-environment-board
+      [environments]="flow.environments"
+      [selected]="selectedEnv()"
+      (selectedChange)="selectedEnv.set($event)"
+    />
+  </section>
+
+  <section class="panel">
+    <div class="mb-3 flex flex-wrap items-center justify-between gap-3">
+      <h2 class="mb-0">Componentes</h2>
+      <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" [checked]="allEnvironments()" (change)="allEnvironments.set(!allEnvironments())" />
+        Ver todos los ambientes
+      </label>
+    </div>
+    @if (!visibleComponents().length) {
+      <p class="m-0 text-sm text-[#5a5f66]">Sin componentes para este ambiente.</p>
+    } @else {
+      <div class="data-table-wrap">
+        <table class="catalog-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Rol</th>
+              <th>Nombre</th>
+              <th>Adaptador</th>
+              <th>Ambiente</th>
+              <th>Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (component of visibleComponents(); track $index) {
+              <tr>
+                <td>{{ component.type || '—' }}</td>
+                <td>{{ roleLabel(component.role) }}</td>
+                <td>
+                  {{ component.name || '—' }}
+                  @if (configEntries(component.config).length) {
+                    <p class="m-0 text-xs text-[#5a5f66]">
+                      @for (entry of configEntries(component.config); track entry.key) {
+                        <span class="mr-2">{{ entry.key }}: {{ entry.value }}</span>
+                      }
+                    </p>
+                  }
+                </td>
+                <td>{{ component.adapterType || '—' }}</td>
+                <td>{{ component.environment || 'Todos' }}</td>
+                <td>{{ sourceLabel(component.source) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>Dependencias</h2>
+    @if (!visibleDependencies().length) {
+      <p class="m-0 text-sm text-[#5a5f66]">Sin dependencias para este ambiente.</p>
+    } @else {
+      <div class="data-table-wrap">
+        <table class="catalog-table">
+          <thead>
+            <tr>
+              <th>Tipo</th>
+              <th>Nombre</th>
+              <th>Referencia</th>
+              <th>Ambiente</th>
+              <th>Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (dependency of visibleDependencies(); track $index) {
+              <tr>
+                <td>{{ dependencyLabel(dependency.kind) }}</td>
+                <td>{{ dependency.name || '—' }}</td>
+                <td>{{ dependency.reference || '—' }}</td>
+                <td>{{ dependency.environment || 'Todos' }}</td>
+                <td>{{ sourceLabel(dependency.source) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <div class="grid gap-4 xl:grid-cols-2">
+    <section class="panel">
+      <h2>Soporte</h2>
+      <dl class="m-0 grid gap-3 text-sm">
+        <div>
+          <dt class="text-[#5a5f66]">Notas</dt>
+          <dd class="m-0 whitespace-pre-wrap">{{ displayText(flow.notes) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Documentación</dt>
+          <dd class="m-0 whitespace-pre-wrap">{{ displayText(flow.supportDocumentation) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Mesa de ayuda</dt>
+          <dd class="m-0 whitespace-pre-wrap">{{ displayText(flow.helpdeskObservations) }}</dd>
+        </div>
+      </dl>
+    </section>
+
+    <section class="panel">
+      <h2>Procedencia</h2>
+      <dl class="m-0 grid gap-3 text-sm">
+        <div>
+          <dt class="text-[#5a5f66]">Último ZIP</dt>
+          <dd class="m-0 break-all">{{ displayText(flow.provenance.lastZip) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Importado</dt>
+          <dd class="m-0">{{ formatDateTime(flow.provenance.lastImportedAt) }}</dd>
+        </div>
+        <div>
+          <dt class="text-[#5a5f66]">Importado por</dt>
+          <dd class="m-0">{{ displayText(flow.provenance.importedBy) }}</dd>
+        </div>
+      </dl>
+    </section>
+  </div>
+
+  <section class="panel">
+    <h2>Historial de versiones</h2>
+    @if (!versions().length) {
+      <p class="m-0 text-sm text-[#5a5f66]">Sin historial de versiones.</p>
+    } @else {
+      <div class="data-table-wrap">
+        <table class="catalog-table">
+          <thead>
+            <tr>
+              <th>Versión</th>
+              <th>Ambiente</th>
+              <th>Fecha</th>
+              <th>Quién</th>
+              <th>Motivo</th>
+              <th>Origen</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (version of versions(); track $index) {
+              <tr>
+                <td>{{ version.version || '—' }}</td>
+                <td>{{ version.environment }}</td>
+                <td>{{ formatDateTime(version.recordedAt) }}</td>
+                <td>{{ version.recordedBy || '—' }}</td>
+                <td>{{ version.reason || '—' }}</td>
+                <td>{{ sourceLabel(version.source) }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <section class="panel">
+    <h2>Auditoría</h2>
+    <app-audit-log [logs]="audit()" />
+  </section>
+
+  <section class="panel">
+    <h2>Editar gobierno</h2>
+    @if (saveMessage()) {
+      <p class="mt-0 text-sm font-medium text-[#18773d]" role="status">{{ saveMessage() }}</p>
+    }
+    <app-governance-form
+      [flow]="flow"
+      [saving]="saving()"
+      [errorMessage]="saveError()"
+      (save)="save($event)"
+    />
+  </section>
+
+  @if (flow.status !== 'retirada') {
+    <section class="panel">
+      <h2>Retirar</h2>
+      <p class="mt-0 text-sm text-[#4f6578]">
+        No borra la ficha. Pasa el estado a retirada y conserva el historial para soporte.
+      </p>
+      @if (!confirmRetire()) {
+        <button type="button" class="btn-secondary" (click)="confirmRetire.set(true)">
+          Retirar interfaz
+        </button>
+      } @else {
+        <form class="grid max-w-xl gap-3" (ngSubmit)="retire()">
+          <div>
+            <label class="field-label" for="retire-reason">Motivo</label>
+            <input id="retire-reason" name="retireReason" class="field-input" [(ngModel)]="retireReason" />
+          </div>
+          <div>
+            <label class="field-label" for="retire-user">Usuario</label>
+            <input id="retire-user" name="retireUser" class="field-input" [(ngModel)]="retireUser" />
+          </div>
+          @if (retireError()) {
+            <p class="m-0 text-sm font-medium text-[#b42318]" role="alert">{{ retireError() }}</p>
+          }
+          <div class="flex flex-wrap gap-2">
+            <app-button type="submit" [isDisabled]="retiring()">
+              {{ retiring() ? 'Retirando...' : 'Confirmar retiro' }}
+            </app-button>
+            <button type="button" class="btn-secondary" (click)="confirmRetire.set(false)">
+              Cancelar
+            </button>
+          </div>
+        </form>
+      }
+    </section>
+  }
+}

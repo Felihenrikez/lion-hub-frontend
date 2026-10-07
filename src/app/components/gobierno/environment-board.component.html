@@ -1,0 +1,140 @@
+<div class="mb-4 flex flex-wrap gap-2" role="tablist">
+  @for (environment of tabs; track environment) {
+    <button
+      type="button"
+      role="tab"
+      class="rounded-full border px-3 py-1.5 text-sm font-semibold"
+      [class.border-lion-800]="selected() === environment"
+      [class.bg-lion-800]="selected() === environment"
+      [class.text-white]="selected() === environment"
+      [class.border-lion-100]="selected() !== environment"
+      [class.bg-white]="selected() !== environment"
+      [class.text-lion-800]="selected() !== environment"
+      [attr.aria-selected]="selected() === environment"
+      (click)="selectedChange.emit(environment)"
+    >
+      {{ environment }}
+      @if (!isPresent(environment)) {
+        <span class="ml-1 text-[10px] font-medium opacity-70">ausente</span>
+      }
+    </button>
+  }
+</div>
+
+@if (current(); as config) {
+  @if (!config.present) {
+    <p class="mt-0 mb-3 text-sm font-medium text-[#8a5a07]">
+      Marcado como ausente en {{ config.environment }}. Si quedó configuración, es la última conocida.
+    </p>
+  }
+
+  <dl class="m-0 grid gap-3 text-sm sm:grid-cols-2">
+    <div>
+      <dt class="text-[#5a5f66]">Package</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ config.packageName || '—' }}</dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Versión</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ config.version || '—' }}</dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Origen del dato</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ sourceLabel(config.source) }}</dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Sincronizado</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ formatDateTime(config.syncedAt) }}</dd>
+    </div>
+    @if (config.sourceZip) {
+      <div class="sm:col-span-2">
+        <dt class="text-[#5a5f66]">ZIP</dt>
+        <dd class="m-0 font-semibold break-all text-lion-800">{{ config.sourceZip }}</dd>
+      </div>
+    }
+  </dl>
+
+  <h3 class="mt-5 mb-2 text-base font-semibold text-lion-800">Inicio</h3>
+  <dl class="m-0 grid gap-3 text-sm sm:grid-cols-2">
+    <div>
+      <dt class="text-[#5a5f66]">Adaptador</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ config.sender.adapterType || '—' }}</dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Dirección</dt>
+      <dd class="m-0 font-semibold break-all text-lion-800">{{ config.sender.address || '—' }}</dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Zona horaria</dt>
+      <dd class="m-0 font-semibold text-lion-800">
+        {{ config.sender.timeZoneIana || config.sender.timeZone || '—' }}
+        @if (config.sender.observesDaylightSaving) {
+          <span class="font-medium text-[#5a5f66]">· horario de verano</span>
+        }
+      </dd>
+    </div>
+    <div>
+      <dt class="text-[#5a5f66]">Programación</dt>
+      <dd class="m-0 font-semibold text-lion-800">{{ config.sender.scheduleDescription || '—' }}</dd>
+    </div>
+  </dl>
+
+  <h3 class="mt-5 mb-2 text-base font-semibold text-lion-800">Salidas</h3>
+  @if (!config.receivers.length) {
+    <p class="m-0 text-sm text-[#5a5f66]">Sin receivers en este ambiente.</p>
+  } @else {
+    <div class="grid gap-3">
+      @for (receiver of config.receivers; track $index) {
+        <article class="rounded-xl border border-lion-100 bg-[#f7fbff] p-3 text-sm">
+          <p class="m-0 font-semibold text-lion-800">
+            {{ receiver.adapterType || 'Salida' }}
+            @if (receiver.inExceptionSubprocess) {
+              <span class="ml-2 rounded-full bg-[#fff5e9] px-2 py-0.5 text-xs text-[#8a5a07]">
+                Subproceso de excepción
+              </span>
+            }
+          </p>
+          <dl class="mt-2 mb-0 grid gap-2 sm:grid-cols-2">
+            @if (receiver.address) {
+              <div>
+                <dt class="text-[#5a5f66]">Dirección</dt>
+                <dd class="m-0 break-all">{{ receiver.address }}</dd>
+              </div>
+            }
+            @if (receiver.rfc) {
+              <div>
+                <dt class="text-[#5a5f66]">RFC</dt>
+                <dd class="m-0">{{ receiver.rfc }}</dd>
+              </div>
+            }
+            @if (receiver.proxyType) {
+              <div>
+                <dt class="text-[#5a5f66]">Proxy</dt>
+                <dd class="m-0">{{ receiver.proxyType }}</dd>
+              </div>
+            }
+            @if (receiver.locationId) {
+              <div>
+                <dt class="text-[#5a5f66]">Location ID</dt>
+                <dd class="m-0">{{ receiver.locationId }}</dd>
+              </div>
+            }
+            @if (receiver.credentialName) {
+              <div>
+                <dt class="text-[#5a5f66]">Credencial</dt>
+                <dd class="m-0">{{ receiver.credentialName }}</dd>
+              </div>
+            }
+            @if (receiver.hostCloudConnector) {
+              <div>
+                <dt class="text-[#5a5f66]">Host Cloud Connector</dt>
+                <dd class="m-0">{{ receiver.hostCloudConnector }}</dd>
+              </div>
+            }
+          </dl>
+        </article>
+      }
+    </div>
+  }
+} @else {
+  <p class="m-0 text-sm text-[#5a5f66]">Este iFlow no tiene configuración en {{ selected() }}.</p>
+}

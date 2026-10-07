@@ -1,6 +1,19 @@
 import { HttpInterceptorFn } from '@angular/common/http';
 
 export const apiCacheInterceptor: HttpInterceptorFn = (req, next) => {
+  const isCatalogApi = req.url.includes('/is-gob/');
+
+  if (isCatalogApi) {
+    return next(
+      req.clone({
+        setHeaders: {
+          'Cache-Control': 'no-cache',
+          Pragma: 'no-cache'
+        }
+      })
+    );
+  }
+
   if (!req.url.includes('/api/')) {
     return next(req);
   }

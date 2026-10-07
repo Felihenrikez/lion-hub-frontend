@@ -1,15 +1,15 @@
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
-import { AppButtonComponent } from '../../components/app-button/app-button.component';
 import { ClientCardComponent } from '../../components/client-card/client-card.component';
+import { HubHeaderComponent } from '../../components/hub-header/hub-header.component';
 import { Client } from '../../models/client.model';
 import { AuthService } from '../../services/auth.service';
 import { ClientApiService } from '../../clients/client-api.service';
 
 @Component({
   selector: 'app-home-page',
-  imports: [AppButtonComponent, ClientCardComponent],
+  imports: [HubHeaderComponent, ClientCardComponent],
   templateUrl: './home-page.component.html'
 })
 export class HomePageComponent implements OnInit {

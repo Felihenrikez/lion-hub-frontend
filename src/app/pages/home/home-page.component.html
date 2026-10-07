@@ -1,24 +1,10 @@
-<section class="relative mb-8">
-  <div class="mb-3 flex justify-end">
-    <app-button (clicked)="logout()">Cerrar sesión</app-button>
-  </div>
-
-  <div class="flex flex-col items-center justify-center gap-4 text-center sm:flex-row sm:text-left">
-    <img
-      src="/assets/lion-mark-transparent.png"
-      alt="LION Consulting"
-      class="h-auto w-[min(78px,18vw)] shrink-0 drop-shadow-[0_8px_16px_rgba(15,68,99,0.14)]"
-    />
-    <div class="flex min-w-0 flex-col gap-1">
-      <h1 class="m-0 text-[clamp(1.35rem,2.2vw,1.85rem)] leading-tight font-bold tracking-[0.3px] text-lion-800">
-        LION Consulting Hub
-      </h1>
-      <p class="m-0 max-w-[34rem] text-[0.95rem] text-[#4f6578]">
-        Selecciona un cliente para revisar indicadores, gráficos y tablas operativas.
-      </p>
-    </div>
-  </div>
-</section>
+<app-hub-header
+  title="Hub de checklist"
+  subtitle="Selecciona un cliente para revisar indicadores, gráficos y tablas operativas."
+  backLink="/"
+  backLabel="Inicio"
+  (logout)="logout()"
+/>
 
 @if (errorMessage()) {
   <p class="text-center font-medium text-[#b42318]" role="alert">{{ errorMessage() }}</p>

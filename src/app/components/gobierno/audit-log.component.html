@@ -1,0 +1,30 @@
+@if (!logs().length) {
+  <p class="m-0 text-sm text-[#5a5f66]">Todavía no hay auditoría para esta ficha.</p>
+} @else {
+  <ol class="m-0 grid list-none gap-3 p-0">
+    @for (log of logs(); track log._id) {
+      <li class="rounded-xl border border-lion-100 bg-[#f7fbff] p-3">
+        <p class="m-0 text-sm font-semibold text-lion-800">
+          {{ actionLabel(log.action) }}
+          <span class="font-medium text-[#5a5f66]">· {{ log.user || 'is_gob' }}</span>
+        </p>
+        <p class="mt-1 mb-0 text-xs text-[#5a5f66]">{{ formatDateTime(log.at) }}</p>
+        @if (log.reason) {
+          <p class="mt-2 mb-0 text-sm">{{ log.reason }}</p>
+        }
+        @if (log.changes.length) {
+          <ul class="mt-2 mb-0 list-disc space-y-1 pl-5 text-sm">
+            @for (change of log.changes; track change.field) {
+              <li>
+                <span class="font-semibold">{{ fieldLabel(change.field) }}:</span>
+                {{ formatAuditValue(change.previousValue) }}
+                →
+                {{ formatAuditValue(change.newValue) }}
+              </li>
+            }
+          </ul>
+        }
+      </li>
+    }
+  </ol>
+}

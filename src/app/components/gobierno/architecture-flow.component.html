@@ -1,0 +1,22 @@
+@if (!nodes().length) {
+  <p class="m-0 text-sm text-[#5a5f66]">Sin arquitectura cargada para {{ environment() }}.</p>
+} @else {
+  <ol class="m-0 flex list-none flex-wrap items-stretch gap-2 p-0">
+    @for (node of nodes(); track $index; let last = $last) {
+      <li class="flex items-center gap-2">
+        <div class="min-w-28 rounded-xl border border-lion-100 bg-[#f7fbff] px-3 py-2">
+          <p class="m-0 text-[10px] font-semibold tracking-wide text-[#5a5f66] uppercase">
+            {{ roleLabel(node.role) }}
+          </p>
+          <p class="m-0 font-semibold text-lion-800">{{ node.label }}</p>
+          @if (node.detail) {
+            <p class="m-0 text-xs text-[#5a5f66]">{{ node.detail }}</p>
+          }
+        </div>
+        @if (!last) {
+          <span class="text-lg text-lion-500" aria-hidden="true">→</span>
+        }
+      </li>
+    }
+  </ol>
+}

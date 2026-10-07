@@ -9,7 +9,7 @@ import {
   signal,
   viewChild
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AppButtonComponent } from '../../components/app-button/app-button.component';
 import { IntegrationJobsTableComponent } from '../../components/integration-jobs-table/integration-jobs-table.component';
 import { InterfaceJobsTableComponent } from '../../components/interface-jobs-table/interface-jobs-table.component';
@@ -19,7 +19,7 @@ import { DashboardPdfService } from '../../services/dashboard-pdf.service';
 
 @Component({
   selector: 'app-client-dashboard',
-  imports: [AppButtonComponent],
+  imports: [AppButtonComponent, RouterLink],
   templateUrl: './client-dashboard.component.html'
 })
 export class ClientDashboardComponent implements OnInit {
@@ -51,7 +51,7 @@ export class ClientDashboardComponent implements OnInit {
   }
 
   goBack(): void {
-    this.router.navigate(['/']);
+    this.router.navigate(['/checklist']);
   }
 
   async downloadPdf(): Promise<void> {

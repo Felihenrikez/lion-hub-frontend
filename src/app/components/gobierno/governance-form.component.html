@@ -1,0 +1,293 @@
+@if (draft(); as draft) {
+  <form class="grid gap-4" (ngSubmit)="submit()" autocomplete="off">
+    <p class="m-0 text-sm text-[#4f6578]">
+      Estos campos son de gobierno. Una importación de ZIP no los pisa. El motivo y el usuario
+      quedan en la auditoría.
+    </p>
+
+    <div class="grid gap-3 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <label class="field-label" for="change-reason">Motivo del cambio</label>
+        <input
+          id="change-reason"
+          name="changeReason"
+          class="field-input"
+          [(ngModel)]="draft.changeReason"
+          required
+        />
+      </div>
+      <div>
+        <label class="field-label" for="change-user">Usuario</label>
+        <input id="change-user" name="user" class="field-input" [(ngModel)]="draft.user" required />
+      </div>
+      <div>
+        <label class="field-label" for="flow-status">Estado</label>
+        <select id="flow-status" name="status" class="field-input" [(ngModel)]="draft.status">
+          @for (status of statuses; track status) {
+            <option [value]="status">{{ statusLabel(status) }}</option>
+          }
+        </select>
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Funcional</h3>
+    <div class="grid gap-3 md:grid-cols-2">
+      <div>
+        <label class="field-label" for="business-name">Nombre de negocio</label>
+        <input
+          id="business-name"
+          name="businessName"
+          class="field-input"
+          [(ngModel)]="draft.businessName"
+        />
+      </div>
+      <div>
+        <label class="field-label" for="business-process">Proceso de negocio</label>
+        <input
+          id="business-process"
+          name="businessProcess"
+          class="field-input"
+          [(ngModel)]="draft.businessProcess"
+        />
+      </div>
+      <div class="md:col-span-2">
+        <label class="field-label" for="functional-description">Descripción funcional</label>
+        <textarea
+          id="functional-description"
+          name="functionalDescription"
+          class="field-input min-h-24"
+          [(ngModel)]="draft.functionalDescription"
+        ></textarea>
+      </div>
+      <div>
+        <label class="field-label" for="source-system">Sistema origen</label>
+        <input
+          id="source-system"
+          name="sourceSystem"
+          class="field-input"
+          [(ngModel)]="draft.sourceSystem"
+        />
+      </div>
+      <div>
+        <label class="field-label" for="target-system">Sistema destino</label>
+        <input
+          id="target-system"
+          name="targetSystem"
+          class="field-input"
+          [(ngModel)]="draft.targetSystem"
+        />
+      </div>
+      <div class="md:col-span-2">
+        <label class="field-label" for="transported-data">Información que transporta</label>
+        <textarea
+          id="transported-data"
+          name="transportedData"
+          class="field-input min-h-20"
+          [(ngModel)]="draft.transportedData"
+        ></textarea>
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Técnica</h3>
+    <div class="grid gap-3">
+      <div>
+        <label class="field-label" for="technical-description">Descripción técnica</label>
+        <textarea
+          id="technical-description"
+          name="technicalDescription"
+          class="field-input min-h-24"
+          [(ngModel)]="draft.technicalDescription"
+        ></textarea>
+      </div>
+      <div class="grid gap-3 md:grid-cols-2">
+        <div>
+          <label class="field-label" for="project">Proyecto</label>
+          <input id="project" name="project" class="field-input" [(ngModel)]="draft.project" />
+        </div>
+        <div>
+          <label class="field-label" for="guideline">Lineamiento</label>
+          <input id="guideline" name="guideline" class="field-input" [(ngModel)]="draft.guideline" />
+        </div>
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Responsable y criticidad</h3>
+    <div class="grid gap-3 md:grid-cols-2">
+      <div>
+        <label class="field-label" for="owner">Responsable</label>
+        <input id="owner" name="owner" class="field-input" [(ngModel)]="draft.owner" />
+      </div>
+      <div>
+        <label class="field-label" for="reviewer">Revisor</label>
+        <input id="reviewer" name="reviewer" class="field-input" [(ngModel)]="draft.reviewer" />
+      </div>
+      <div>
+        <label class="field-label" for="criticality">Criticidad</label>
+        <select id="criticality" name="criticality" class="field-input" [(ngModel)]="draft.criticality">
+          <option value="">Sin definir</option>
+          @for (criticality of criticalities; track criticality) {
+            <option [value]="criticality">{{ criticalityLabel(criticality) }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="sla">SLA de respuesta (minutos)</label>
+        <input
+          id="sla"
+          name="slaResponseMinutes"
+          class="field-input"
+          type="number"
+          min="0"
+          step="1"
+          [(ngModel)]="draft.slaResponseMinutes"
+        />
+      </div>
+      <div class="md:col-span-2">
+        <label class="field-label" for="business-impact">Impacto de negocio</label>
+        <textarea
+          id="business-impact"
+          name="businessImpact"
+          class="field-input min-h-20"
+          [(ngModel)]="draft.businessImpact"
+        ></textarea>
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Ejecución</h3>
+    <div class="grid gap-3 md:grid-cols-2">
+      <div>
+        <label class="field-label" for="execution-mode">Modo</label>
+        <select
+          id="execution-mode"
+          name="executionMode"
+          class="field-input"
+          [(ngModel)]="draft.executionMode"
+        >
+          <option value="">Sin definir</option>
+          @for (mode of executionModes; track mode) {
+            <option [value]="mode">{{ executionLabel(mode) }}</option>
+          }
+        </select>
+      </div>
+      <div>
+        <label class="field-label" for="execution-frequency">Frecuencia</label>
+        <input
+          id="execution-frequency"
+          name="executionFrequency"
+          class="field-input"
+          [(ngModel)]="draft.executionFrequency"
+          placeholder="cada 30 minutos"
+        />
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Soporte</h3>
+    <div class="grid gap-3">
+      <div>
+        <label class="field-label" for="notes">Notas</label>
+        <textarea id="notes" name="notes" class="field-input min-h-20" [(ngModel)]="draft.notes"></textarea>
+      </div>
+      <div>
+        <label class="field-label" for="support-docs">Documentación de soporte</label>
+        <textarea
+          id="support-docs"
+          name="supportDocumentation"
+          class="field-input min-h-20"
+          [(ngModel)]="draft.supportDocumentation"
+        ></textarea>
+      </div>
+      <div>
+        <label class="field-label" for="helpdesk">Observaciones de mesa de ayuda</label>
+        <textarea
+          id="helpdesk"
+          name="helpdeskObservations"
+          class="field-input min-h-20"
+          [(ngModel)]="draft.helpdeskObservations"
+        ></textarea>
+      </div>
+    </div>
+
+    <h3 class="m-0 text-base font-semibold text-lion-800">Dependencias manuales</h3>
+    <p class="m-0 text-sm text-[#4f6578]">
+      Al guardar se reemplazan todas las dependencias manuales. Las automáticas del ZIP se
+      conservan.
+    </p>
+    <div class="grid gap-3">
+      @for (dependency of draft.manualDependencies; track $index) {
+        <div class="grid gap-2 rounded-xl border border-lion-100 p-3 md:grid-cols-[minmax(0,11rem)_1fr_1fr_auto]">
+          <div>
+            <label class="field-label" [attr.for]="'dep-kind-' + $index">Tipo</label>
+            <select
+              [id]="'dep-kind-' + $index"
+              [name]="'dep-kind-' + $index"
+              class="field-input"
+              [(ngModel)]="dependency.kind"
+            >
+              @for (kind of dependencyKinds; track kind) {
+                <option [value]="kind">{{ dependencyLabel(kind) }}</option>
+              }
+            </select>
+          </div>
+          <div>
+            <label class="field-label" [attr.for]="'dep-name-' + $index">Nombre</label>
+            <input
+              [id]="'dep-name-' + $index"
+              [name]="'dep-name-' + $index"
+              class="field-input"
+              [(ngModel)]="dependency.name"
+            />
+          </div>
+          <div>
+            <label class="field-label" [attr.for]="'dep-ref-' + $index">Referencia</label>
+            <input
+              [id]="'dep-ref-' + $index"
+              [name]="'dep-ref-' + $index"
+              class="field-input"
+              [(ngModel)]="dependency.reference"
+              placeholder="sin secretos"
+            />
+          </div>
+          <div class="flex items-end">
+            <button type="button" class="btn-secondary" (click)="removeDependency($index)">
+              Quitar
+            </button>
+          </div>
+        </div>
+      }
+      <div>
+        <button type="button" class="btn-secondary" (click)="addDependency()">Agregar dependencia</button>
+      </div>
+    </div>
+
+    @if (draft.receiverHosts.length) {
+      <h3 class="m-0 text-base font-semibold text-lion-800">Host de Cloud Connector</h3>
+      <p class="m-0 text-sm text-[#4f6578]">
+        Solo se documenta el host. No se guarda la credencial ni el secreto.
+      </p>
+      <div class="grid gap-3">
+        @for (host of draft.receiverHosts; track host.environment + host.receiverKey) {
+          <div>
+            <label class="field-label" [attr.for]="'host-' + $index">{{ host.label }}</label>
+            <input
+              [id]="'host-' + $index"
+              [name]="'host-' + host.environment + '-' + $index"
+              class="field-input"
+              [(ngModel)]="host.hostCloudConnector"
+              placeholder="cc.cliente.cl"
+            />
+          </div>
+        }
+      </div>
+    }
+
+    @if (errorMessage()) {
+      <p class="m-0 text-sm font-medium text-[#b42318]" role="alert">{{ errorMessage() }}</p>
+    }
+
+    <div>
+      <app-button type="submit" [isDisabled]="saving()">
+        {{ saving() ? 'Guardando...' : 'Guardar gobierno' }}
+      </app-button>
+    </div>
+  </form>
+}

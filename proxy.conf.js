@@ -1,14 +1,17 @@
 const { logger } = require('./logger/winston.config.cjs');
 const { sanitizeHeaders } = require('./logger/proxy-logging.cjs');
 
-const apiUrl = process.env.API_URL || 'http://localhost:8080';
-let backendConnected = false;
+const hubApiUrl = process.env.API_URL || 'http://localhost:8080';
+const catalogApiUrl = process.env.IS_GOB_API_URL || 'http://localhost:8090';
 
-module.exports = {
-  '/api': {
-    target: apiUrl,
+function createProxy(target, pathRewrite) {
+  let backendConnected = false;
+
+  return {
+    target,
     secure: false,
     changeOrigin: true,
+    ...(pathRewrite ? { pathRewrite } : {}),
     configure: (proxy) => {
       proxy.on('proxyReq', (proxyReq, req) => {
         req._proxyStartedAt = Date.now();
@@ -21,7 +24,7 @@ module.exports = {
           params: req.params ?? {},
           headers: sanitizeHeaders(req.headers),
           ip: req.socket?.remoteAddress ?? null,
-          target: `${apiUrl}${req.url}`
+          target: `${target}${req.url}`
         });
       });
 
@@ -32,7 +35,7 @@ module.exports = {
         if (!backendConnected && statusCode > 0) {
           backendConnected = true;
           logger.info('Backend conectado exitosamente', {
-            target: apiUrl,
+            target,
             statusCode,
             url: req.url
           });
@@ -63,10 +66,15 @@ module.exports = {
           type: 'error',
           method: req.method,
           url: req.url,
-          target: apiUrl,
+          target,
           message: err.message
         });
       });
     }
-  }
+  };
+}
+
+module.exports = {
+  '/is-gob': createProxy(catalogApiUrl, { '^/is-gob': '/api' }),
+  '/api': createProxy(hubApiUrl)
 };

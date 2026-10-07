@@ -1,0 +1,270 @@
+<app-hub-header
+  title="Gobierno de interfaces"
+  subtitle="Catálogo de iFlows de SAP Integration Suite: qué hacen, quién responde, en qué ambiente están y de qué dependen."
+  backLink="/"
+  backLabel="Inicio"
+  (logout)="logout()"
+/>
+
+<section class="panel">
+  <h2>Tablero</h2>
+  <p class="mt-0 mb-3 text-sm text-[#4f6578]">
+    Cuenta todo el catálogo, o solo un cliente si filtraste por cliente. La tabla aplica el resto de
+    filtros.
+  </p>
+  @if (summaryError()) {
+    <p class="m-0 text-sm font-medium text-[#b42318]" role="alert">{{ summaryError() }}</p>
+  } @else if (summary(); as summary) {
+    <app-summary-board
+      [summary]="summary"
+      [activeClient]="clientId"
+      [activeStatus]="status"
+      [activeComponent]="componentType"
+      (selectClient)="toggleClient($event)"
+      (selectStatus)="toggleStatus($event)"
+      (selectComponent)="toggleComponent($event)"
+    />
+  } @else {
+    <p class="m-0 text-sm text-[#5a5f66]" aria-live="polite">Cargando resumen...</p>
+  }
+</section>
+
+<section class="panel">
+  <h2>Buscar</h2>
+  <form class="grid gap-3 md:grid-cols-2 xl:grid-cols-4" (ngSubmit)="apply()" autocomplete="off">
+    <div class="md:col-span-2 xl:col-span-4">
+      <label class="field-label" for="flow-q">Texto libre</label>
+      <input
+        id="flow-q"
+        name="q"
+        class="field-input"
+        [(ngModel)]="q"
+        placeholder="preventa, JDBC, materiales, factura, RFC"
+      />
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-client">Cliente</label>
+      <input
+        id="flow-client"
+        name="clientId"
+        class="field-input"
+        list="flow-clients"
+        [(ngModel)]="clientId"
+        placeholder="embonor"
+      />
+      <datalist id="flow-clients">
+        @for (clientId of clientOptions(); track clientId) {
+          <option [value]="clientId">{{ clientLabel(clientId) }}</option>
+        }
+      </datalist>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-environment">Ambiente</label>
+      <select id="flow-environment" name="environment" class="field-input" [(ngModel)]="environment">
+        <option value="">Todos</option>
+        @for (environment of environments; track environment) {
+          <option [value]="environment">{{ environment }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-status">Estado</label>
+      <select id="flow-status" name="status" class="field-input" [(ngModel)]="status">
+        <option value="">Todos</option>
+        @for (status of statuses; track status) {
+          <option [value]="status">{{ statusLabel(status) }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-dependency">Dependencia</label>
+      <select
+        id="flow-dependency"
+        name="dependencyKind"
+        class="field-input"
+        [(ngModel)]="dependencyKind"
+      >
+        <option value="">Todas</option>
+        @for (kind of dependencyKinds; track kind) {
+          <option [value]="kind">{{ kind }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-component">Componente</label>
+      <input
+        id="flow-component"
+        name="componentType"
+        class="field-input"
+        list="component-types"
+        [(ngModel)]="componentType"
+        placeholder="JDBC, Groovy, RFC"
+      />
+      <datalist id="component-types">
+        @for (type of componentTypes; track type) {
+          <option [value]="type"></option>
+        }
+      </datalist>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-sender">Inicio</label>
+      <input
+        id="flow-sender"
+        name="sender"
+        class="field-input"
+        list="sender-types"
+        [(ngModel)]="sender"
+        placeholder="Solo el sender"
+      />
+      <datalist id="sender-types">
+        @for (type of componentTypes; track type) {
+          <option [value]="type"></option>
+        }
+      </datalist>
+    </div>
+
+    <div>
+      <label class="field-label" for="flow-receiver">Salida</label>
+      <input
+        id="flow-receiver"
+        name="receiver"
+        class="field-input"
+        list="receiver-types"
+        [(ngModel)]="receiver"
+        placeholder="Algún receiver"
+      />
+      <datalist id="receiver-types">
+        @for (type of componentTypes; track type) {
+          <option [value]="type"></option>
+        }
+      </datalist>
+    </div>
+
+    <div class="flex flex-wrap items-center gap-2 md:col-span-2 xl:col-span-4">
+      <app-button type="submit">Buscar</app-button>
+      <button type="button" class="btn-secondary" (click)="clear()">Limpiar</button>
+      <button type="button" class="btn-secondary" (click)="showImport.set(!showImport())">
+        {{ showImport() ? 'Ocultar importación' : 'Importar ZIP' }}
+      </button>
+    </div>
+  </form>
+</section>
+
+@if (showImport()) {
+  <app-zip-import (imported)="reload()" />
+}
+
+<section class="panel">
+  <div class="mb-3 flex flex-wrap items-end justify-between gap-3">
+    <h2 class="mb-0">Interfaces</h2>
+    <p class="m-0 text-sm text-[#5a5f66]" aria-live="polite">{{ total() }} fichas</p>
+  </div>
+
+  @if (errorMessage()) {
+    <p class="text-sm font-medium text-[#b42318]" role="alert">{{ errorMessage() }}</p>
+  } @else if (loading()) {
+    <p class="m-0 text-sm text-[#5a5f66]" aria-live="polite">Cargando fichas...</p>
+  } @else if (!items().length) {
+    <p class="m-0 text-sm text-[#5a5f66]">No hay fichas con esos filtros.</p>
+  } @else {
+    <div class="data-table-wrap">
+      <table class="catalog-table">
+        <thead>
+          <tr>
+            <th>Interfaz</th>
+            <th>Cliente</th>
+            <th>Estado</th>
+            <th>Criticidad</th>
+            <th>Ambientes</th>
+            <th>Responsable</th>
+            <th>Actualizada</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (flow of items(); track flow._id) {
+            <tr>
+              <td>
+                <a
+                  class="font-semibold text-lion-800 no-underline hover:underline"
+                  [routerLink]="['/gobierno', flow._id]"
+                  [state]="{ listQuery: listQuery() }"
+                >
+                  {{ flow.businessName || flow.name }}
+                </a>
+                @if (flow.businessName && flow.businessName !== flow.name) {
+                  <p class="m-0 text-xs text-[#5a5f66]">{{ flow.name }}</p>
+                }
+                <p class="m-0 text-xs text-[#5a5f66]">
+                  {{ flow.packageKey }} · {{ flow.artifactId }}
+                </p>
+              </td>
+              <td>{{ clientLabel(flow.clientId) }}</td>
+              <td>
+                <span [class]="'meta-badge ' + statusTone(flow.status)">
+                  {{ statusLabel(flow.status) }}
+                </span>
+              </td>
+              <td>
+                @if (flow.criticality) {
+                  <span [class]="'meta-badge ' + criticalityTone(flow.criticality)">
+                    {{ criticalityLabel(flow.criticality) }}
+                  </span>
+                } @else {
+                  —
+                }
+              </td>
+              <td>
+                <div class="flex gap-1">
+                  @for (environment of environments; track environment) {
+                    <span
+                      class="rounded px-1.5 py-0.5 text-[10px] font-bold"
+                      [class.bg-lion-800]="isPresent(flow, environment)"
+                      [class.text-white]="isPresent(flow, environment)"
+                      [class.bg-lion-100]="!isPresent(flow, environment)"
+                      [class.text-[#5a5f66]]="!isPresent(flow, environment)"
+                    >
+                      {{ environment }}
+                    </span>
+                  }
+                </div>
+              </td>
+              <td>{{ flow.owner || '—' }}</td>
+              <td>{{ formatDateTime(flow.updatedAt) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  }
+
+  <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
+    <label class="flex items-center gap-2 text-sm text-[#4f6578]">
+      Por página
+      <select class="field-input w-auto" [value]="limit" (change)="changeLimit($event)">
+        <option value="20">20</option>
+        <option value="50">50</option>
+        <option value="100">100</option>
+      </select>
+    </label>
+    <div class="flex items-center gap-2">
+      <button type="button" class="btn-secondary" [disabled]="page <= 1" (click)="goToPage(page - 1)">
+        Anterior
+      </button>
+      <span class="text-sm text-[#4f6578]">Página {{ page }} de {{ pageCount() }}</span>
+      <button
+        type="button"
+        class="btn-secondary"
+        [disabled]="page >= pageCount()"
+        (click)="goToPage(page + 1)"
+      >
+        Siguiente
+      </button>
+    </div>
+  </div>
+</section>

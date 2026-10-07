@@ -1,0 +1,134 @@
+<section class="panel">
+  <h2>Importar ZIP</h2>
+  <p class="mt-0 mb-4 text-sm text-[#4f6578]">
+    El ZIP actualiza paquete, versión, componentes y dependencias automáticas. No pisa el gobierno
+    ya escrito en la ficha. Máximo 250 MB.
+  </p>
+
+  <form class="grid gap-3 md:grid-cols-2" (ngSubmit)="submit()" autocomplete="off">
+    <div>
+      <label class="field-label" for="import-client">Cliente</label>
+      <select
+        id="import-client"
+        name="clientChoice"
+        class="field-input"
+        [(ngModel)]="clientChoice"
+        required
+      >
+        <option value="">Selecciona</option>
+        @for (client of clients; track client.id) {
+          <option [value]="client.id">{{ client.name }}</option>
+        }
+        <option value="__other">Otro</option>
+      </select>
+    </div>
+
+    @if (clientChoice === '__other') {
+      <div>
+        <label class="field-label" for="import-client-custom">Slug del cliente</label>
+        <input
+          id="import-client-custom"
+          name="customClientId"
+          class="field-input"
+          [(ngModel)]="customClientId"
+          placeholder="embonor"
+          required
+        />
+      </div>
+    }
+
+    <div>
+      <label class="field-label" for="import-environment">Ambiente</label>
+      <select
+        id="import-environment"
+        name="environment"
+        class="field-input"
+        [(ngModel)]="environment"
+        required
+      >
+        @for (environment of environments; track environment) {
+          <option [value]="environment">{{ environment }}</option>
+        }
+      </select>
+    </div>
+
+    <div>
+      <label class="field-label" for="import-user">Usuario de auditoría</label>
+      <input id="import-user" name="user" class="field-input" [(ngModel)]="user" placeholder="opcional" />
+    </div>
+
+    <div class="md:col-span-2">
+      <label class="field-label" for="import-file">Archivo ZIP</label>
+      <input
+        id="import-file"
+        class="field-input"
+        type="file"
+        accept=".zip,application/zip"
+        (change)="onFile($event)"
+      />
+    </div>
+
+    <label class="flex items-start gap-2 text-sm text-[#162530] md:col-span-2">
+      <input name="retireMissing" type="checkbox" [(ngModel)]="retireMissing" />
+      <span>
+        Marcar como ausentes, en este ambiente, los iFlows del package que ya no vengan en el ZIP.
+        La ficha no se borra.
+      </span>
+    </label>
+
+    @if (errorMessage()) {
+      <p class="m-0 text-sm font-medium text-[#b42318] md:col-span-2" role="alert">
+        {{ errorMessage() }}
+      </p>
+    }
+
+    <div>
+      <app-button type="submit" [isDisabled]="uploading()">
+        {{ uploading() ? 'Importando...' : 'Importar' }}
+      </app-button>
+    </div>
+  </form>
+
+  @if (result(); as result) {
+    <div class="mt-4">
+      <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Artefactos</span>
+          <strong class="text-lg text-lion-800">{{ result.artifacts }}</strong>
+        </div>
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Creadas</span>
+          <strong class="text-lg text-lion-800">{{ result.created }}</strong>
+        </div>
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Actualizadas</span>
+          <strong class="text-lg text-lion-800">{{ result.updated }}</strong>
+        </div>
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Sin cambios</span>
+          <strong class="text-lg text-lion-800">{{ result.unchanged }}</strong>
+        </div>
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Restauradas</span>
+          <strong class="text-lg text-lion-800">{{ result.restored }}</strong>
+        </div>
+        <div class="rounded-xl border border-lion-100 bg-[#f7fbff] p-2.5 text-center">
+          <span class="block text-xs text-[#5a5f66]">Retiradas</span>
+          <strong class="text-lg text-lion-800">{{ result.retired }}</strong>
+        </div>
+      </div>
+
+      @if (result.packages.length) {
+        <p class="mt-3 mb-0 text-sm text-[#4f6578]">Packages: {{ result.packages.join(', ') }}</p>
+      }
+
+      @if (result.errors.length) {
+        <ul class="mt-3 mb-0 list-disc space-y-1 pl-5 text-sm text-[#9f1b1b]" role="alert">
+          @for (error of result.errors; track $index) {
+            <li>{{ error.packageName }} / {{ error.artifactId }}: {{ error.message }}</li>
+          }
+        </ul>
+      }
+    </div>
+  }
+</section>

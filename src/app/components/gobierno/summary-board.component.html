@@ -1,0 +1,73 @@
+@if (empty()) {
+  <p class="m-0 text-sm text-[#5a5f66]">Aún no hay fichas en el catálogo.</p>
+} @else {
+  <div class="grid gap-4 lg:grid-cols-3">
+    <section>
+      <h3 class="mt-0 mb-2 text-sm font-semibold tracking-wide text-[#5a5f66] uppercase">Por estado</h3>
+      <div class="flex flex-wrap gap-2">
+        @for (item of statuses(); track item.key) {
+          <button
+            type="button"
+            class="rounded-full border px-3 py-1.5 text-sm font-semibold transition"
+            [class.border-lion-800]="activeStatus() === item.key"
+            [class.bg-lion-800]="activeStatus() === item.key"
+            [class.text-white]="activeStatus() === item.key"
+            [class.border-lion-100]="activeStatus() !== item.key"
+            [class.bg-[#f7fbff]]="activeStatus() !== item.key"
+            [class.text-lion-800]="activeStatus() !== item.key"
+            (click)="selectStatus.emit(item.key)"
+          >
+            {{ statusLabel(item.key) }}
+            <span class="ml-1">{{ item.count }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h3 class="mt-0 mb-2 text-sm font-semibold tracking-wide text-[#5a5f66] uppercase">Por cliente</h3>
+      <div class="flex flex-wrap gap-2">
+        @for (item of clients(); track item.key) {
+          <button
+            type="button"
+            class="rounded-full border px-3 py-1.5 text-sm font-semibold transition"
+            [class.border-lion-800]="activeClient() === item.key"
+            [class.bg-lion-800]="activeClient() === item.key"
+            [class.text-white]="activeClient() === item.key"
+            [class.border-lion-100]="activeClient() !== item.key"
+            [class.bg-[#f7fbff]]="activeClient() !== item.key"
+            [class.text-lion-800]="activeClient() !== item.key"
+            (click)="selectClient.emit(item.key)"
+          >
+            {{ clientLabel(item.key) }}
+            <span class="ml-1">{{ item.count }}</span>
+          </button>
+        }
+      </div>
+    </section>
+
+    <section>
+      <h3 class="mt-0 mb-2 text-sm font-semibold tracking-wide text-[#5a5f66] uppercase">
+        Por componente
+      </h3>
+      <div class="flex flex-wrap gap-2">
+        @for (item of components(); track item.key) {
+          <button
+            type="button"
+            class="rounded-full border px-3 py-1.5 text-sm font-semibold transition"
+            [class.border-lion-800]="activeComponent() === item.key"
+            [class.bg-lion-800]="activeComponent() === item.key"
+            [class.text-white]="activeComponent() === item.key"
+            [class.border-lion-100]="activeComponent() !== item.key"
+            [class.bg-[#f7fbff]]="activeComponent() !== item.key"
+            [class.text-lion-800]="activeComponent() !== item.key"
+            (click)="selectComponent.emit(item.key)"
+          >
+            {{ item.key }}
+            <span class="ml-1">{{ item.count }}</span>
+          </button>
+        }
+      </div>
+    </section>
+  </div>
+}
